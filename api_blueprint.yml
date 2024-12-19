@@ -1,0 +1,244 @@
+FORMAT: 1A
+HOST: https://api.example.com
+
+# eShop - Catalog HTTP API
+
+The Catalog Microservice HTTP API. This is a Data-Driven/CRUD microservice sample.
+
+## /api/catalog/items
+
+### List catalog items [GET]
+
++ **Summary**: Get a paginated list of items in the catalog.
++ **Operation ID**: `ListItems`
+
+#### Query Parameters
++ `PageSize` (optional, number, default: `10`) - Number of items to return in a single page of results.
++ `PageIndex` (optional, number, default: `0`) - The index of the page of results to return.
++ `api-version` (required, string, example: `1.0`) - The API version in the format `major.minor`.
+
+#### Responses
+
++ 200 (application/json)
+    + Body
+
+            {
+              "pageIndex": 0,
+              "pageSize": 10,
+              "count": 100,
+              "data": [
+                {
+                  "id": 1,
+                  "name": "Item 1",
+                  "description": "Description for Item 1",
+                  "price": 10.99,
+                  "pictureFileName": "item1.png",
+                  "catalogTypeId": 1,
+                  "catalogType": { "id": 1, "type": "Type1" },
+                  "catalogBrandId": 1,
+                  "catalogBrand": { "id": 1, "brand": "Brand1" },
+                  "availableStock": 100,
+                  "restockThreshold": 10,
+                  "maxStockThreshold": 500,
+                  "onReorder": false
+                }
+              ]
+            }
+
++ 400 (application/problem+json)
+    + Body
+
+            {
+              "type": "https://example.com/probs/bad-request",
+              "title": "Bad Request",
+              "status": 400,
+              "detail": "Invalid query parameters.",
+              "instance": "/api/catalog/items"
+            }
+
+---
+
+### Create or replace a catalog item [PUT]
+
++ **Summary**: Create or replace a catalog item.
++ **Operation ID**: `UpdateItem`
+
+#### Query Parameters
++ `api-version` (required, string, example: `1.0`) - The API version in the format `major.minor`.
+
+#### Request Body (application/json)
+
++ Schema
+
+        {
+          "id": 1,
+          "name": "New Item",
+          "description": "A description",
+          "price": 12.50,
+          "pictureFileName": "newitem.png",
+          "catalogTypeId": 2,
+          "catalogBrandId": 1,
+          "availableStock": 50,
+          "restockThreshold": 5,
+          "maxStockThreshold": 200,
+          "onReorder": false
+        }
+
+#### Responses
+
++ 201 - Created
++ 404 (application/json)
+    + Body
+
+            {
+              "type": "https://example.com/probs/not-found",
+              "title": "Not Found",
+              "status": 404,
+              "detail": "Item not found.",
+              "instance": "/api/catalog/items"
+            }
+
+---
+
+### Create a catalog item [POST]
+
++ **Summary**: Create a new item in the catalog.
++ **Operation ID**: `CreateItem`
+
+#### Query Parameters
++ `api-version` (required, string, example: `1.0`) - The API version in the format `major.minor`.
+
+#### Request Body (application/json)
+
++ Schema
+
+        {
+          "name": "New Item",
+          "description": "A description",
+          "price": 12.50,
+          "pictureFileName": "newitem.png",
+          "catalogTypeId": 2,
+          "catalogBrandId": 1,
+          "availableStock": 50,
+          "restockThreshold": 5,
+          "maxStockThreshold": 200,
+          "onReorder": false
+        }
+
+#### Responses
+
++ 201 - Created
++ 400 (application/problem+json)
+    + Body
+
+            {
+              "type": "https://example.com/probs/bad-request",
+              "title": "Bad Request",
+              "status": 400,
+              "detail": "Invalid input.",
+              "instance": "/api/catalog/items"
+            }
+
+---
+
+## /api/catalog/items/{id}
+
+### Get catalog item [GET]
+
++ **Summary**: Get an item from the catalog.
++ **Operation ID**: `GetItem`
+
+#### Parameters
++ `id` (required, number) - The catalog item ID.
++ `api-version` (required, string, example: `1.0`) - The API version in the format `major.minor`.
+
+#### Responses
+
++ 200 (application/json)
+    + Body
+
+            {
+              "id": 1,
+              "name": "Item 1",
+              "description": "Description for Item 1",
+              "price": 10.99
+            }
+
++ 404 - Not Found
+
+---
+
+### Delete catalog item [DELETE]
+
++ **Summary**: Delete the specified catalog item.
++ **Operation ID**: `DeleteItem`
+
+#### Parameters
++ `id` (required, number) - The ID of the catalog item to delete.
++ `api-version` (required, string, example: `1.0`) - The API version in the format `major.minor`.
+
+#### Responses
+
++ 204 - No Content
++ 404 - Not Found
+
+---
+
+## /api/catalog/items/type/{typeId}/brand/{brandId}
+
+### Get catalog items by type and brand [GET]
+
++ **Summary**: Get catalog items of the specified type and brand.
++ **Operation ID**: `GetItemsByTypeAndBrand`
+
+#### Parameters
++ `typeId` (required, number) - The type of items to return.
++ `brandId` (required, number) - The brand of items to return.
++ `PageSize` (optional, number, default: `10`) - Number of items to return in a single page.
++ `PageIndex` (optional, number, default: `0`) - The index of the page of results to return.
++ `api-version` (required, string, example: `1.0`) - The API version in the format `major.minor`.
+
+#### Responses
+
++ 200 (application/json)
+    + Body
+
+            {
+              "pageIndex": 0,
+              "pageSize": 10,
+              "count": 20,
+              "data": [
+                {
+                  "id": 3,
+                  "name": "Item 3",
+                  "catalogTypeId": 2,
+                  "catalogBrandId": 1
+                }
+              ]
+            }
+
++ 400 (application/problem+json)
+
+---
+
+## /api/catalog/catalogtypes
+
+### List catalog item types [GET]
+
++ **Summary**: Get a list of the types of catalog items.
++ **Operation ID**: `ListItemTypes`
+
+#### Query Parameters
++ `api-version` (required, string, example: `1.0`)
+
+#### Responses
+
++ 200 (application/json)
+    + Body
+
+            [
+              { "id": 1, "type": "Type1" },
+              { "id": 2, "type": "Type2" }
+            ]
+
++ 400 (application/problem+json)
